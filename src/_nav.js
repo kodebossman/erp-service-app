@@ -19,7 +19,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'New Application',
-    to: '/regristration',
+    to: '/registration',
     icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
   },
   {

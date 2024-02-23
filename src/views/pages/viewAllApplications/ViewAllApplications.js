@@ -1,49 +1,48 @@
 import { CButton, CContainer } from "@coreui/react"
 import React,{useState} from 'react';
-import { Drawer, Space, Table, Tag } from 'antd';
+import { Drawer, Space, Table, Tag,Modal } from 'antd';
+import  useSWR  from'swr';
+import { Link } from "react-router-dom";
 
-const data = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['accepted'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['rejected'],
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sydney No. 1 Lake Park',
-    tags: ['pending'],
-  },
-];
+
+
+  const fetcher = (url) => fetch(url).then((res) => res.json());
+
+
 
 const ViewAllApplications = ()=>{
-    const [open, setOpen] = useState(false);
- 
+  
 
-    const onClose = () => {
-        setOpen(false);
-    };
+    const {
+      data: applicationsData,
+    
+    } = useSWR(
+      `http://localhost:8080/application/all?page=1&size=5&sort=idNumber`,
+      fetcher,
+      { revalidateOnFocus: false, revalidateOnReconnect: false }
+    );
+    console.log("applicationsData---",applicationsData);
+    const data = applicationsData?.body?.data?.map((record, index) => {
+      return  {
+        key: index,
+        name: record.personalDetails.firstName + ' ' + record.personalDetails.lastName,
+        applicationType: record.personalDetails.applicationType,
+        address: record.personalDetails.address +''+record.personalDetails.city+''+record.personalDetails.country,
+        applicationStatus: 'accepted',
+        applicationId: record.personalDetails.idNumber
+      }})
+
     const columns = [
         {
           title: 'Name',
           dataIndex: 'name',
           key: 'name',
-          render: (text) => <a>{text}</a>,
+         
         },
         {
-          title: 'Age',
-          dataIndex: 'age',
-          key: 'age',
+          title: 'Application Type',
+          dataIndex: 'applicationType',
+          key: 'applicationType',
         },
         {
           title: 'Address',
@@ -51,34 +50,35 @@ const ViewAllApplications = ()=>{
           key: 'address',
         },
         {
-          title: 'Tags',
-          key: 'tags',
-          dataIndex: 'tags',
-          render: (_, { tags }) => (
-            <>
-              {tags.map((tag) => {
-                let color =  tag==='accepted' ? 'green' : null;
-                if (tag === 'rejected') {
-                  color = 'volcano';
-                }
-                if (tag === 'pending') {
-                    color = 'geekBlue';
-                  }
-                return (
-                  <Tag color={color} key={tag}>
-                    {tag.toUpperCase()}
-                  </Tag>
-                );
-              })}
-            </>
-          ),
-        },
+          title: 'Application Status',
+          key: 'applicationStatus',
+          dataIndex: 'applicationStatus',
+          render: (_, { applicationStatus }) => {
+            let color = null;
+          
+            if (applicationStatus === 'accepted') {
+              color = 'green';
+            } else if (applicationStatus === 'rejected') {
+              color = 'volcano';
+            } else if (applicationStatus === 'pending') {
+              color = 'geekBlue';
+            }
+          
+            return (
+              
+                <Tag color={color} key={applicationStatus}>
+                  {applicationStatus}
+                </Tag>
+             
+            );
+          }}
+          ,
         {
           title: 'Action',
           key: 'action',
           render: (_, record) => (
             <Space size="middle">
-              <CButton onClick={()=>setOpen(true)}>View</CButton>
+              <Link to={`/applications/${record.applicationId}`} >View</Link>
              
             </Space>
           ),
@@ -91,23 +91,7 @@ const ViewAllApplications = ()=>{
  <Table columns={columns} dataSource={data} />;
 
         </CContainer>
- <Drawer  title="Application Details"
-                placement="right"
-                onClose={onClose}
-                open={open}
-
-                width={800}
-                zIndex={2000}
-                extra={
-                    <Space>
-
-                        <CButton>Accept</CButton>
-                        <CButton color="danger">Reject</CButton>
-                    </Space>
-
-                }>
-    
- </Drawer>
+      
         </>
     )
 }

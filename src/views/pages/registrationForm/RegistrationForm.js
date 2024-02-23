@@ -1,85 +1,87 @@
 import React, { useState } from 'react'
-import { CFormLabel, CFormInput, CCol, CRow, CContainer, CForm,CButton } from '@coreui/react'
-import { Card, Steps } from 'antd'
+import { CFormLabel, CFormInput, CCol, CRow, CContainer, CForm, CButton } from '@coreui/react'
+import { Card, Steps,message,Result } from 'antd'
+import axios from 'axios'
 
 const RegistrationForm = () => {
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(0)
+  const [isLoading, setIsLoading] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const success = () => {
+    messageApi.open({
+     
+      content:  <Result
+    status="success"
+    title="Your application was successfully registered."
+    
+   
+  />,})}
   const next = () => {
-    setCurrent(current + 1);
-  };
+    setCurrent(current + 1)
+  }
   const prev = () => {
-    setCurrent(current - 1);
-  };
+    setCurrent(current - 1)
+  }
   const [formData, setFormData] = useState(
     {
-      title: "",
-      firstName: "",
-      lastName: "",
-      preferredName: "",
-      idNumber: "",
-      address: "",
-      city: "",
-      province: "",
-      postalCode: "",
-      country: "",
-      mobileNumber: "",
-      emailAddress: "",
-      nationality: "",
-      gender: "",
-      applicationType: "",
-      applicationDate: "",
-      nextOfKin: {
-        applicantId: 1,
-        title: "Mr",
-        firstName: "John",
-        lastName: "Doe",
-        preferredName: "Johnny",
-        idNumber: "AB2C123",
-        address: "123 Main St",
-        city: "Anytown",
-        province: "State",
-        postalCode: "12345",
-        country: "Country",
-        mobileNumber: "+12234567890",
-        emailAddress: "doe@lse.com",
-        nationality: "National",
-        gender: "Male",
-        relationshipToApplicant: "Father"
-    },
-    documentation: {
-        ownerId: 1,
-        documentName: "Document",
-        documentURL: "document",
-        documentType: "Type"
-    },
-    employmentDetails: {
-        applicantId: 1,
-        nameOfEmployer: "ACME Corp",
-        position: "Manager",
-        address: "456 Elm St",
-        startDate: "2023-01-01",
-        endDate: "2024-01-01",
-        employmentStatus: "Full-time",
-        city: "Othertown",
-        region: "Region",
-        country: "Other Country"
-    },
-    previousQualifications: {
-        ownerId: 1,
-        nameOfInstitution: "Sample Institution",
-        highestQualificationObtained: "Sample Qualification",
-        isCIMARegistered: "Yes",
-        cimaLevel: "Operational",
-        cimaContactId: "12345",
-        cimaEmail: "example@example.com",
-        listOfProfessionalBodies: "Sample Body",
-        papersLeft: 2,
-        isMemberOfProfessionalBody: "Yes",
-        packageStudyDuration: 12,
-        consentFormUrl: "https://example.co",
-        hasConsented: "Yes"
-    }
+      personalDetailsTitle: "",
+      personalDetailsFirstName: "",
+      personalDetailsLastName: "",
+      personalDetailsPreferredName: "",
+      personalDetailsIdNumber: "",
+      personalDetailsAddress: "",
+      personalDetailsCity: "",
+      personalDetailsProvince: "",
+      personalDetailsPostalCode: "",
+      personalDetailsCountry: "",
+      personalDetailsMobileNumber: "",
+      personalDetailsEmailAddress: "",
+      personalDetailsNationality: "",
+      personalDetailsGender: "",
+      personalDetailsApplicationType: "",
+      personalDetailsApplicationDate: "",
+      nextOfKinTitle: "",
+      nextOfKinFirstName: "",
+      nextOfKinLastName: "",
+      nextOfKinPreferredName: "",
+      nextOfKinIdNumber: "",
+      nextOfKinAddress: "",
+      nextOfKinCity: "",
+      nextOfKinProvince: "",
+      nextOfKinPostalCode: "",
+      nextOfKinCountry: "",
+      nextOfKinMobileNumber: "",
+      nextOfKinEmailAddress: "",
+      nextOfKinNationality: "",
+      nextOfKinGender: "",
+      nextOfKinRelationshipToApplicant: "",
+      documentationDocumentName: "",
+      documentationDocumentURL: "",
+      documentationDocumentType: "",
+      employmentDetailsNameOfEmployer: "",
+      employmentDetailsPosition: "",
+      employmentDetailsAddress: "",
+      employmentDetailsStartDate: "",
+      employmentDetailsEndDate: "",
+      employmentDetailsEmploymentStatus: "",
+      employmentDetailsCity: "",
+      employmentDetailsRegion: "",
+      employmentDetailsCountry: "",
+      previousQualificationsNameOfInstitution: "",
+      previousQualificationsHighestQualificationObtained: "",
+      previousQualificationsIsCimaRegistered: "",
+      previousQualificationsCimaLevel: "",
+      previousQualificationsCimaContactId: "",
+      previousQualificationsCimaEmail: "",
+      previousQualificationsListOfProfessionalBodies: "",
+      previousQualificationsPapersLeft: "",
+      previousQualificationsIsMemberOfProfessionalBody: "",
+      previousQualificationsPackageStudyDuration: "",
+      previousQualificationsConsentFormUrl: "",
+      previousQualificationsHasConsented: ""
   }
+  
   )
 
   const handleChange = (e) => {
@@ -90,567 +92,669 @@ const RegistrationForm = () => {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault()
     console.log(formData)
-    const raw = JSON.stringify(formData)
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
+    const reqObject = {
+      personalDetails: {
+          title: formData.personalDetailsTitle,
+          firstName: formData.personalDetailsFirstName,
+          lastName: formData.personalDetailsLastName,
+          preferredName: formData.personalDetailsPreferredName,
+          idNumber: formData.personalDetailsIdNumber,
+          address: formData.employmentDetailsAddress,
+          city: formData.personalDetailsCity,
+          province: formData.personalDetailsProvince,
+          postalCode: formData.personalDetailsPostalCode,
+          country: formData.personalDetailsCountry,
+          mobileNumber: formData.personalDetailsMobileNumber,
+          emailAddress: formData.personalDetailsEmailAddress,
+          nationality: formData.personalDetailsNationality,
+          gender: formData.personalDetailsGender,
+          applicationType: formData.personalDetailsApplicationType,
+          applicationDate: formData.personalDetailsApplicationDate
       },
+      nextOfKin: {
+          title: formData.nextOfKinTitle,
+          firstName:formData.nextOfKinFirstName,
+          lastName: formData.nextOfKinLastName,
+          preferredName: formData.nextOfKinPreferredName,
+          idNumber: formData.nextOfKinIdNumber,
+          address: formData.nextOfKinAddress,
+          city: formData.nextOfKinCity,
+          province: formData.nextOfKinProvince,
+          postalCode: formData.nextOfKinPostalCode,
+          country: formData.nextOfKinCountry,
+          mobileNumber: formData.nextOfKinMobileNumber,
+          emailAddress: formData.nextOfKinAddress,
+          nationality: formData.nextOfKinNationality,
+          gender: formData.nextOfKinGender,
+          relationshipToApplicant: formData.nextOfKinRelationshipToApplicant
+      },
+      documentation: {
+          documentName: "Document",
+          documentURL: "document",
+          documentType: "Type"
+      },
+      employmentDetails: {
+          nameOfEmployer: formData.employmentDetailsNameOfEmployer,
+          position: formData.employmentDetailsPosition,
+          address: formData.employmentDetailsAddress,
+          startDate: formData.employmentDetailsStartDate,
+          endDate: formData.employmentDetailsEndDate,
+          employmentStatus: formData.employmentDetailsEmploymentStatus,
+          city: formData.employmentDetailsCity,
+          region: formData.employmentDetailsRegion,
+          country:formData.employmentDetailsCountry
+      },
+      previousQualifications: {
+          nameOfInstitution: formData.previousQualificationsNameOfInstitution,
+          highestQualificationObtained: formData.previousQualificationsHighestQualificationObtained,
+          isCIMARegistered: formData.previousQualificationsIsCimaRegistered,
+          cimaLevel: "Operational",
+          cimaContactId: formData.previousQualificationsCimaContactId,
+          cimaEmail: formData.previousQualificationsCimaEmail,
+          listOfProfessionalBodies: formData.previousQualificationsListOfProfessionalBodies,
+          papersLeft: formData.previousQualificationsPapersLeft,
+          isMemberOfProfessionalBody: formData.previousQualificationsIsMemberOfProfessionalBody,
+          packageStudyDuration: formData.previousQualificationsPackageStudyDuration,
+          consentFormUrl: "https://example.co",
+          hasConsented: "Yes"
+      }
+  };
+  
+    const raw = JSON.stringify(reqObject)
+    console.log(raw)
+    try {
+      const response = await axios.post(
+        `http://localhost:8080/application/create`,
+
+        raw,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      //console.log("response---", response);
+      setIsLoading(false);
+
+      success();
       
-      body: raw,
-     
-    };
+      
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error submitting form:", error);
+    }
     
-    fetch("http://localhost:8080/application/create", requestOptions)
-      .then((response) => response.text())
-      .then((result) => alert(result))
-      .catch((error) => console.error(error));
   }
   const steps = [
-   
     {
-      title: "Personal Details",
-      
-      content: (
-        <Card  style={{marginBottom:"4px"}}>
-       
+      title: 'Personal Details',
 
-        <CRow>
-          <CCol md="6">
-            <div className="mb-3">
-              <CFormLabel htmlFor="title">Title</CFormLabel>
-              <CFormInput
-                type="text"
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-3">
-              <CFormLabel htmlFor="firstName">First Name</CFormLabel>
-              <CFormInput
-                type="text"
-                id="firstName"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-3">
-              <CFormLabel htmlFor="idNumber">ID Number</CFormLabel>
-              <CFormInput
-                type="text"
-                id="idNumber"
-                name="idNumber"
-                value={formData.idNumber}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-3">
-              <CFormLabel htmlFor="address">Address</CFormLabel>
-              <CFormInput
-                type="text"
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-3">
-              <CFormLabel htmlFor="city">City</CFormLabel>
-              <CFormInput
-                type="text"
-                id="city"
-                name="city"
-                value={formData.city}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-3">
-              <CFormLabel htmlFor="province">Province</CFormLabel>
-              <CFormInput
-                type="text"
-                id="province"
-                name="province"
-                value={formData.province}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-3">
-              <CFormLabel htmlFor="postalCode">Postal Code</CFormLabel>
-              <CFormInput
-                type="text"
-                id="postalCode"
-                name="postalCode"
-                value={formData.postalCode}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-3">
-              <CFormLabel htmlFor="country">Country</CFormLabel>
-              <CFormInput
-                type="text"
-                id="country"
-                name="country"
-                value={formData.country}
-                onChange={handleChange}
-              />
-            </div>
-            
-          </CCol>
-          <CCol md="6">
-            <div className="mb-3">
-              <CFormLabel htmlFor="lastName">Last Name</CFormLabel>
-              <CFormInput
-                type="text"
-                id="lastName"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-3">
-              <CFormLabel htmlFor="preferredName">Preferred Name</CFormLabel>
-              <CFormInput
-                type="text"
-                id="preferredName"
-                name="preferredName"
-                value={formData.preferredName}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-3">
-              <CFormLabel htmlFor="mobileNumber">Mobile Number</CFormLabel>
-              <CFormInput
-                type="text"
-                id="mobileNumber"
-                name="mobileNumber"
-                value={formData.mobileNumber}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-3">
-              <CFormLabel htmlFor="emailAddress">Email Address</CFormLabel>
-              <CFormInput
-                type="email"
-                id="emailAddress"
-                name="emailAddress"
-                value={formData.emailAddress}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-3">
-              <CFormLabel htmlFor="nationality">Nationality</CFormLabel>
-              <CFormInput
-                type="text"
-                id="nationality"
-                name="nationality"
-                value={formData.nationality}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-3">
-              <CFormLabel htmlFor="gender">Gender</CFormLabel>
-              <CFormInput
-                type="text"
-                id="gender"
-                name="gender"
-                value={formData.gender}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-3">
-              <CFormLabel htmlFor="applicationType">Application Type</CFormLabel>
-              <CFormInput
-                type="text"
-                id="applicationType"
-                name="applicationType"
-                value={formData.applicationType}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-3">
-              <CFormLabel htmlFor="applicationDate">Application Date</CFormLabel>
-              <CFormInput
-                type="date"
-                id="applicationDate"
-                name="applicationDate"
-                value={formData.applicationDate}
-                onChange={handleChange}
-              />
-            </div>
-            {/* Add ot
+      content: (
+        <Card style={{ marginBottom: '4px' }}>
+          <CRow>
+            <CCol md="6">
+              <div className="mb-3">
+                <CFormLabel htmlFor="personalDetailsTitle">Title</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="personalDetailsTitle"
+                  name="personalDetailsTitle"
+                  value={formData.personalDetailsTitle}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="personalDetailsFirstName">First Name</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="personalDetailsFirstName"
+                  name="personalDetailsFirstName"
+                  value={formData.personalDetailsFirstName}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="personalDetailsIdNumber">ID Number</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="personalDetailsIdNumber"
+                  name="personalDetailsIdNumber"
+                  value={formData.personalDetailsIdNumber}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="personalDetailsAddress">Address</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="personalDetailsAddress"
+                  name="personalDetailsAddress"
+                  value={formData.personalDetailsAddress}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="personalDetailsCity">City</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="personalDetailsCity"
+                  name="personalDetailsCity"
+                  value={formData.personalDetailsCity}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="personalDetailsProvince">Province</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="personalDetailsProvince"
+                  name="personalDetailsProvince"
+                  value={formData.personalDetailsProvince}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="personalDetailsPostalCode">Postal Code</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="personalDetailsPostalCode"
+                  name="personalDetailsPostalCode"
+                  value={formData.personalDetailsPostalCode}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="personalDetailsCountry">Country</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="personalDetailsCountry"
+                  name="personalDetailsCountry"
+                  value={formData.personalDetailsCountry}
+                  onChange={handleChange}
+                />
+              </div>
+            </CCol>
+            <CCol md="6">
+              <div className="mb-3">
+                <CFormLabel htmlFor="personalDetailsLastName">Last Name</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="personalDetailsLastName"
+                  name="personalDetailsLastName"
+                  value={formData.personalDetailsLastName}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="preferredName">Preferred Name</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="preferredName"
+                  name="personalDetailsPreferredName"
+                  value={formData.personalDetailsPreferredName}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="personalDetailsMobileNumber">Mobile Number</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="personalDetailsMobileNumber"
+                  name="personalDetailsMobileNumber"
+                  value={formData.personalDetailsMobileNumber}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="personalDetailsEmailAddress">Email Address</CFormLabel>
+                <CFormInput
+                  type="email"
+                  id="personalDetailsEmailAddress"
+                  name="personalDetailsEmailAddress"
+                  value={formData.personalDetailsEmailAddress}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="personalDetailsNationality">Nationality</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="personalDetailsNationality"
+                  name="personalDetailsNationality"
+                  value={formData.personalDetailsNationality}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="personalDetailsGender">Gender</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="personalDetailsGender"
+                  name="personalDetailsGender"
+                  value={formData.personalDetailsGender}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="personalDetailsApplicationType">Application Type</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="personalDetailsApplicationType"
+                  name="personalDetailsApplicationType"
+                  value={formData.personalDetailsApplicationType}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="personalDetailsApplicationDate">Application Date</CFormLabel>
+                <CFormInput
+                  type="date"
+                  id="personalDetailsApplicationDate"
+                  name="personalDetailsApplicationDate"
+                  value={formData.personalDetailsApplicationDate}
+                  onChange={handleChange}
+                />
+              </div>
+              {/* Add ot
             {/* Add other fields in the second column */}
-          </CCol>
-        </CRow>
+            </CCol>
+          </CRow>
         </Card>
-      
       ),
     },
 
     {
-      title: "Next of Kin",
+      title: 'Next of Kin',
       // icon: <MdTagFaces fontSize={"22px"} />,
-      content: (<Card  style={{marginBottom:"4px"}}>
+      content: (
+        <Card style={{ marginBottom: '4px' }}>
+          <CRow>
+            <CCol md="6">
+              <div className="mb-3">
+                <CFormLabel htmlFor="nextOfKinFirstName">First Name</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="nextOfKinFirstName"
+                  name="nextOfKinFirstName"
+                  value={formData.nextOfKinFirstName}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="nextOfKinIdNumber">ID Number</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="nextOfKinIdNumber"
+                  name="nextOfKinIdNumber"
+                  value={formData.nextOfKinIdNumber}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="nextOfKinAddress">Address</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="nextOfKinAddress"
+                  name="nextOfKinAddress"
+                  value={formData.nextOfKinAddress}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="nextOfKinCity">City</CFormLabel>
+                <CFormInput
+                  type="nextOfKinCity"
+                  id="nextOfKinCity"
+                  name="nextOfKinCity"
+                  value={formData.nextOfKinCity}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="nextOfKinProvince">Province</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="nextOfKinProvince"
+                  name="nextOfKinProvince"
+                  value={formData.nextOfKinProvince}
+                  onChange={handleChange}
+                />
+              </div>
 
+              {/* Add other fields in the first column */}
+            </CCol>
+            <CCol md="6">
+              <div className="mb-3">
+                <CFormLabel htmlFor="nextOfKinLastName">Last Name</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="nextOfKinLastName"
+                  name="nextOfKinLastName"
+                  value={formData.nextOfKinLastName}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="nextOfKinPostalCode">Postal Code</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="nextOfKinPostalCode"
+                  name="nextOfKinPostalCode"
+                  value={formData.nextOfKinPostalCode}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="nextOfKinCountry">Country</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="nextOfKinCountry"
+                  name="nextOfKinCountry"
+                  value={formData.nextOfKinCountry}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="nextOfKinMobileNumber">Mobile Number</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="nextOfKinMobileNumber"
+                  name="nextOfKinMobileNumber"
+                  value={formData.nextOfKinMobileNumber}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="nextOfKinEmailAddress">Email Address</CFormLabel>
+                <CFormInput
+                  type="email"
+                  id="nextOfKinEmailAddress"
+                  name="nextOfKinEmailAddress"
+                  value={formData.nextOfKinEmailAddress}
+                  onChange={handleChange}
+                />
+              </div>
+
+              {/* Add other fields in the second column */}
+            </CCol>
+          </CRow>
+        </Card>
+      ),
+    },
+    {
+      title: 'Documentation',
+      content: (
+        <Card style={{ marginBottom: '4px' }}>
+          <CRow>
+            <CCol md="6">
+              <div className="mb-3">
+                <CFormLabel htmlFor="province">ID/Passport copy </CFormLabel>
+                <CFormInput id="province" name="province" onChange={handleChange} value={formData.documentationDocumentName} />
+              </div>
+             
+
+              {/* Add other fields in the first column */}
+            </CCol>
+          
+          </CRow>
+        </Card>
+      ),
+    },
+    {
+      title: 'Employment Details',
+      content: (
+        <Card style={{ marginBottom: '4px' }}>
+          <CRow>
+            <CCol md="6">
+              <div className="mb-3">
+                <CFormLabel htmlFor="employmentDetailsNameOfEmployer">Name Of Employer</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="employmentDetailsNameOfEmployer"
+                  name="employmentDetailsNameOfEmployer"
+                  value={formData.employmentDetailsNameOfEmployer}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="employmentDetailsPosition">Job Title</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="employmentDetailsPosition"
+                  name="employmentDetailsPosition"
+                  value={formData.employmentDetailsPosition}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="employmentDetailsStartDate">Start Date </CFormLabel>
+                <CFormInput
+                  type="date"
+                  id="employmentDetailsStartDate"
+                  name="employmentDetailsStartDate"
+                  value={formData.employmentDetailsStartDate}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="employmentDetailsAddress">Address</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="address"
+                  name="employmentDetailsAddress"
+                  value={formData.employmentDetailsAddress}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="city">City</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="employmentDetailsCity"
+                  name="employmentDetailsCity"
+                  value={formData.employmentDetailsCity}
+                  onChange={handleChange}
+                />
+              </div>
+
+              {/* Add other fields in the first column */}
+            </CCol>
+            <CCol md="6">
+        
+              <div className="mb-3">
+                <CFormLabel htmlFor="employmentDetailsEmploymentStatus">Employment Status</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="employmentDetailsEmploymentStatus"
+                  name="employmentDetailsEmploymentStatus"
+                  value={formData.employmentDetailsEmploymentStatus}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="employmentDetailsEndDate">End Date </CFormLabel>
+                <CFormInput
+                  type="date"
+                  id="employmentDetailsEndDate"
+                  name="employmentDetailsEndDate"
+                  value={formData.employmentDetailsEndDate}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor="employmentDetailsRegion">Province</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="employmentDetailsRegion"
+                  name="employmentDetailsRegion"
+                  value={formData.employmentDetailsRegion}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="mb-3">
+                <CFormLabel htmlFor="employmentDetailsCountry">Country</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="employmentDetailsCountry"
+                  name="employmentDetailsCountry"
+                  value={formData.employmentDetailsCountry}
+                  onChange={handleChange}
+                />
+              </div>
+              {/* Add other fields in the second column */}
+            </CCol>
+          </CRow>
+        </Card>
+      ),
+    },
+    {
+      title: 'Previous Qualifications',
+      content: <Card style={{ marginBottom: '4px' }}>
       <CRow>
         <CCol md="6">
-         
           <div className="mb-3">
-            <CFormLabel htmlFor="firstName">First Name</CFormLabel>
+            <CFormLabel htmlFor="previousQualificationsNameOfInstitution">Name Of Instituition</CFormLabel>
             <CFormInput
               type="text"
-              id="firstName"
-              name="firstName"
-              value={formData.nextOfKin.firstName}
+              id="previousQualificationsNameOfInstitution"
+              name="previousQualificationsNameOfInstitution"
+              value={formData.previousQualificationsNameOfInstitution}
               onChange={handleChange}
             />
           </div>
           <div className="mb-3">
-            <CFormLabel htmlFor="idNumber">ID Number</CFormLabel>
+            <CFormLabel htmlFor="previousQualificationsIsCimaRegistered">CIMA Registered?</CFormLabel>
             <CFormInput
               type="text"
-              id="idNumber"
-              name="idNumber"
-              value={formData.nextOfKin.idNumber}
+              id="previousQualificationsIsCimaRegistered"
+              name="previousQualificationsIsCimaRegistered"
+              value={formData.previousQualificationsIsCimaRegistered}
               onChange={handleChange}
             />
           </div>
           <div className="mb-3">
-            <CFormLabel htmlFor="address">Address</CFormLabel>
+            <CFormLabel htmlFor="previousQualificationsCimaLevel">CIMA Level</CFormLabel>
             <CFormInput
               type="text"
-              id="address"
-              name="address"
-              value={formData.nextOfKin.address}
+              id="personalDetailsIdNumber"
+              name="previousQualificationsCimaLevel"
+              value={formData.previousQualificationsCimaLevel}
               onChange={handleChange}
             />
           </div>
           <div className="mb-3">
-            <CFormLabel htmlFor="city">City</CFormLabel>
+            <CFormLabel htmlFor="personalDetailsAddress">CIMA Contact</CFormLabel>
             <CFormInput
               type="text"
-              id="city"
-              name="city"
-              value={formData.nextOfKin.city}
+              id="personalDetailsAddress"
+              name="previousQualificationsCimaContactId"
+              value={formData.previousQualificationsCimaContactId}
               onChange={handleChange}
             />
           </div>
           <div className="mb-3">
-            <CFormLabel htmlFor="province">Province</CFormLabel>
-            <CFormInput
-              type="text"
-              id="province"
-              name="province"
-              value={formData.nextOfKin.province}
-              onChange={handleChange}
-            />
-          </div>
-        
-         
-          
-         
-          {/* Add other fields in the first column */}
-        </CCol>
-        <CCol md="6">
-          <div className="mb-3">
-            <CFormLabel htmlFor="lastName">Last Name</CFormLabel>
-            <CFormInput
-              type="text"
-              id="lastName"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <CFormLabel htmlFor="postalCode">Postal Code</CFormLabel>
-            <CFormInput
-              type="text"
-              id="postalCode"
-              name="postalCode"
-              value={formData.nextOfKin.postalCode}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <CFormLabel htmlFor="country">Country</CFormLabel>
-            <CFormInput
-              type="text"
-              id="country"
-              name="country"
-              value={formData.nextOfKin.country}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <CFormLabel htmlFor="mobileNumber">Mobile Number</CFormLabel>
-            <CFormInput
-              type="text"
-              id="mobileNumber"
-              name="mobileNumber"
-              value={formData.nextOfKin.mobileNumber}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <CFormLabel htmlFor="emailAddress">Email Address</CFormLabel>
+            <CFormLabel htmlFor="personalDetailsCity">CIMA Email</CFormLabel>
             <CFormInput
               type="email"
-              id="emailAddress"
-              name="emailAddress"
-              value={formData.nextOfKin.emailAddress}
+              id="personalDetailsCity"
+              name="previousQualificationsCimaEmail"
+              value={formData.previousQualificationsCimaEmail}
               onChange={handleChange}
             />
           </div>
          
-          {/* Add other fields in the second column */}
-        </CCol>
-      </CRow>
-      </Card>),
-    },
-    {
-      title: "Documentation",
-      content:(<Card  style={{marginBottom:"4px"}}>
-
-      <CRow>
-        <CCol md="6">
-         
-         
-          <div className="mb-3">
-            <CFormLabel htmlFor="province">ID/Passport copy </CFormLabel>
-            <CFormInput
-              type="file"
-              id="province"
-              name="province"
-              
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <CFormLabel htmlFor="postalCode">Proof of address</CFormLabel>
-            <CFormInput
-              type="file"
-              id="postalCode"
-              name="postalCode"
-              
-              onChange={handleChange}
-            />
-          </div>
-          
-          {/* Add other fields in the first column */}
         </CCol>
         <CCol md="6">
           <div className="mb-3">
-            <CFormLabel htmlFor="lastName">Qualifications: (certificates,diploma, degree & etc) </CFormLabel>
+            <CFormLabel htmlFor="previousQualificationsHighestQualificationObtained}">Highest Qualifications</CFormLabel>
             <CFormInput
-              type="file"
-              id="lastName"
-              name="lastName"
-              
+              type="text"
+              id="previousQualificationsHighestQualificationObtained}"
+              name="previousQualificationsHighestQualificationObtained}"
+              value={formData.previousQualificationsHighestQualificationObtained}
               onChange={handleChange}
             />
           </div>
           <div className="mb-3">
-            <CFormLabel htmlFor="preferredName">Academic Transcripts</CFormLabel>
+            <CFormLabel htmlFor="preferredName">Package Study Duration</CFormLabel>
             <CFormInput
-              type="file"
+              type="number"
               id="preferredName"
-              name="preferredName"
-             
+              name="previousQualificationsPackageStudyDuration"
+              value={formData.previousQualificationsPackageStudyDuration}
               onChange={handleChange}
             />
           </div>
-          
-          {/* Add other fields in the second column */}
+          <div className="mb-3">
+            <CFormLabel htmlFor="previousQualificationsListOfProfessionalBodies">Professional Bodies</CFormLabel>
+            <CFormInput
+              type="text"
+              id="personalDetailsProvince"
+              name="previousQualificationsListOfProfessionalBodies"
+              value={formData.previousQualificationsListOfProfessionalBodies}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="mb-3">
+            <CFormLabel htmlFor="previousQualificationsPapersLeft">Papers Left</CFormLabel>
+            <CFormInput
+              type="number"
+              id="personalDetailsPostalCode"
+              name="previousQualificationsPapersLeft"
+              value={formData.previousQualificationsPapersLeft}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="mb-3">
+            <CFormLabel htmlFor="previousQualificationsIsMemberOfProfessionalBody">Member of professional Board?</CFormLabel>
+            <CFormInput
+              type="text"
+              id="personalDetailsCountry"
+              name="previousQualificationsIsMemberOfProfessionalBody"
+              value={formData.previousQualificationsIsMemberOfProfessionalBody}
+              onChange={handleChange}
+            />
+          </div>
+       
+          {/* Add ot
+        {/* Add other fields in the second column */}
         </CCol>
       </CRow>
-      </Card>)
+    </Card>,
     },
-    {
-      title: "Employment Details",
-      content:( <Card  style={{marginBottom:"4px"}}>
-
-      <CRow>
-        <CCol md="6">
-          <div className="mb-3">
-            <CFormLabel htmlFor="nameOfEmployer">Name Of Employer</CFormLabel>
-            <CFormInput
-              type="text"
-              id="nameOfEmployer"
-              name="nameOfEmployer"
-              value={formData.employmentDetails.nameOfEmployer}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <CFormLabel htmlFor="position">Job Title</CFormLabel>
-            <CFormInput
-              type="text"
-              id="position"
-              name="position"
-              value={formData.employmentDetails.position}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <CFormLabel htmlFor="startDate">Start Date </CFormLabel>
-            <CFormInput
-              type="date"
-              id="startDate"
-              name="startDate"
-              value={formData.employmentDetails.startDate}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <CFormLabel htmlFor="address">Address</CFormLabel>
-            <CFormInput
-              type="text"
-              id="address"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <CFormLabel htmlFor="city">City</CFormLabel>
-            <CFormInput
-              type="text"
-              id="city"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-            />
-          </div>
-          
-         
-          
-         
-        
-          {/* Add other fields in the first column */}
-        </CCol>
-        <CCol md="6">
-          <div className="mb-3">
-            <CFormLabel htmlFor="lastName">Last Name</CFormLabel>
-            <CFormInput
-              type="text"
-              id="lastName"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <CFormLabel htmlFor="employmentStatus">Employment Status</CFormLabel>
-            <CFormInput
-              type="text"
-              id="employmentStatus"
-              name="employmentStatus"
-              value={formData.employmentDetails.employmentStatus}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <CFormLabel htmlFor="endDate">End Date </CFormLabel>
-            <CFormInput
-              type="date"
-              id="endDate"
-              name="endDate"
-              value={formData.employmentDetails.endDate}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <CFormLabel htmlFor="province">Province</CFormLabel>
-            <CFormInput
-              type="text"
-              id="province"
-              name="province"
-              value={formData.province}
-              onChange={handleChange}
-            />
-          </div>
-          
-          <div className="mb-3">
-            <CFormLabel htmlFor="country">Country</CFormLabel>
-            <CFormInput
-              type="text"
-              id="country"
-              name="country"
-              value={formData.country}
-              onChange={handleChange}
-            />
-          </div>
-          {/* Add other fields in the second column */}
-        </CCol>
-      </CRow>
-      </Card>
-
-      )
-    },
-    {
-      title: "Review",
-      content:( <Card  style={{marginBottom:"4px"}}>
-
-     
-      </Card>
-
-      )
-    }
-  ];
+  ]
 
   return (
-    <CContainer >
-     
-      
-       <Steps      current={current} items={steps} />
-       <CForm onSubmit={handleSubmit}>
+    
+    <CContainer>
+       {contextHolder}
+       <Card>
 
-
-      
-      
-       {steps[current].content}
-       {
-         current === steps.length - 1? (
-           <CButton
-             color="primary"
-             
-             type="submit"
-             
-             
-           >
-             Submit
-           </CButton>
-         ) : (<CButton
-          
-          
-          onClick={() =>next()}
-          
-          
-        >
-          Next
-        </CButton>)
-       }
-       {
-        current> 1 &&(<CButton p-4
-          color="primary"
-          
-          onClick={() =>prev()}
-          
-        >
-          Prev
-        </CButton>)
-       }
-
-       </CForm>
-
-
+      <Steps current={current} items={steps} />
+       </Card>
+      <CForm onSubmit={handleSubmit}>
+        {steps[current].content}
+        {current === steps.length - 1 && (
+          <CButton color="primary" type="submit">
+            Submit
+          </CButton>
+        ) }
+        {current != steps.length - 1 && (
+          <CButton color="primary" onClick={()=>next()}>
+           Next
+          </CButton>
+        ) }
+        {current > 1 && (
+          <CButton p-4 color="primary" onClick={() => prev()}>
+            Prev
+          </CButton>
+        )}
+      </CForm>
 
       {/* You can continue adding rows and columns for other fields */}
     </CContainer>
